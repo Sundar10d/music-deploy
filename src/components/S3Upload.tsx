@@ -14,11 +14,13 @@ const config = {
   region: REGION,
   accessKeyId: ACCESS_ID,
   secretAccessKey: SECRET_ACCESS_KEY,
+  dirName:"30mins"
 };
 
 const S3Upload = () => {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<any>(null);
+  const [fileUploaded, setFileUploaded] = useState(false);
   const dateISOString = new Date(+new Date() + 864e5).toISOString();
   const xAmzDate = dateISOString
     .split("-")
@@ -30,6 +32,7 @@ const S3Upload = () => {
   const dateYMD = dateISOString.split("T")[0].split("-").join("");
   console.log("handleFileInput", selectedFile);
   const handleFileInput = (e: any) => {
+    setFileUploaded(false)
     setSelectedFile(e.target.files[0]);
   };
   function getPolicy(config: any) {
@@ -128,7 +131,7 @@ const S3Upload = () => {
 
   const handleUpload = async (file: any) => {
     await uploadFile(file, config)
-      .then((data) => console.log(data))
+      .then((data) => setFileUploaded(true))
       .catch((err) => console.error(err));
   };
 
@@ -153,6 +156,9 @@ const S3Upload = () => {
           {<span className="fileName">{selectedFile["name"]}</span>}
         </p>
       )}
+      {fileUploaded &&
+      <div className="successUpload">File Uploded Successfully ..!</div>
+      }
       <Button onClick={() => navigate("/")} color="primary" className="mt-5">
         Go Back
       </Button>

@@ -3,7 +3,18 @@ import { Buffer } from "buffer";
 import CryptoJS from "crypto-js";
 import Button from "@material-ui/core/Button";
 import { useNavigate } from "react-router-dom";
+import Loader from "./loader/Loader";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    button: {
+    margin: theme.spacing(1),
+    display: "flex",
+    fontWeight: "bolder"
+    },
+  })
+);
 const S3_BUCKET = process.env.REACT_APP_SOURCE_BUCKET || "";
 const REGION = process.env.REACT_APP_REGION || "";
 const ACCESS_ID = process.env.REACT_APP_ACCESS_ID || "";
@@ -14,11 +25,13 @@ const config = {
   region: REGION,
   accessKeyId: ACCESS_ID,
   secretAccessKey: SECRET_ACCESS_KEY,
-  dirName:"30mins"
+  dirName: "30mins"
 };
 
 const S3Upload = () => {
+  const classes = useStyles();
   const navigate = useNavigate();
+  const [loader, setLoader] = useState(false)
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [fileUploaded, setFileUploaded] = useState(false);
   const dateISOString = new Date(+new Date() + 864e5).toISOString();
@@ -122,22 +135,38 @@ const S3Upload = () => {
     return Promise.resolve({
       bucket: config.bucketName,
       key: `${config.dirName ? config.dirName + "/" : ""}${file.name}`,
-      location: `${url}${config.dirName ? config.dirName + "/" : ""}${
-        file.name
-      }`,
+      location: `${url}${config.dirName ? config.dirName + "/" : ""}${file.name
+        }`,
       result: data,
     });
   }
 
   const handleUpload = async (file: any) => {
+    setLoader(true);
     await uploadFile(file, config)
-      .then((data) => setFileUploaded(true))
+      .then((data) => {
+        setFileUploaded(true);
+        setLoader(false);
+      })
       .catch((err) => console.error(err));
   };
 
   return (
+    <>
+    {fileUploaded &&<div className="Nav">
+    <Button
+      variant="contained"
+      color="secondary"
+      size="large"
+      className={classes.button}
+      onClick={() => navigate("/bucketlist")}
+    >
+      VIEW UPLOADED DATA IN S3
+    </Button>
+  </div>}
     <div className="main">
       <h1>React S3 File Upload</h1>
+      {loader && <Loader />}
       <div className="uploadWrapper">
         <Button className="upload" component="label">
           Choose your Video File
@@ -157,12 +186,13 @@ const S3Upload = () => {
         </p>
       )}
       {fileUploaded &&
-      <div className="successUpload">File Uploded Successfully ..!</div>
+        <div className="successUpload">File has been uploaded successfully ..!</div>
       }
       <Button onClick={() => navigate("/")} color="primary" className="mt-5">
         Go Back
       </Button>
     </div>
+    </>
   );
 };
 

@@ -8,8 +8,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     button: {
       margin: theme.spacing(1),
-      width: "40%",
-      height: "10%",
+      width: "100%",
       fontSize: "x-large",
       fontWeight: "bolder",
     },
@@ -22,6 +21,7 @@ const Home = () => {
 
   return (
     <div className="home">
+      <div>
       <Button
         variant="contained"
         color="primary"
@@ -42,6 +42,29 @@ const Home = () => {
       >
         VIEW UPLOADED DATA IN S3
       </Button>
+      </div>
+      <div>
+      <Button
+        variant="contained"
+        color="primary"
+        size="large"
+        className={classes.button}
+        onClick={() => navigate("/drop")}
+      >
+        UPLOAD TO DropBox
+      </Button>
+      <br />
+      <br />
+      <Button
+        variant="contained"
+        color="secondary"
+        size="large"
+        className={classes.button}
+        onClick={() => navigate("/droplist")}
+      >
+        VIEW UPLOADED DATA IN DropBox
+      </Button>
+      </div>
     </div>
   );
 };
